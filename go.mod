@@ -3,6 +3,7 @@ module umbilical-choir-release-master
 go 1.22
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/paulmach/orb v0.11.1
 	github.com/sirupsen/logrus v1.9.3
 	gopkg.in/yaml.v2 v2.4.0

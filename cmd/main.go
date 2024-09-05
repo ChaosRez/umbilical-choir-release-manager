@@ -2,7 +2,9 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
+	"net/http"
 	"umbilical-choir-release-master/internal/config"
+	"umbilical-choir-release-master/internal/handlers"
 	"umbilical-choir-release-master/internal/models"
 )
 
@@ -17,10 +19,10 @@ func main() {
 		Children:       []*models.Child{},
 		GeographicArea: conf.ServiceAreaPolygon,
 	}
-	log.Infof("%v", rm.Children)
 
-	//http.HandleFunc("/releases", handlers.ReleaseHandler)
-	//http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/releases", handlers.ReleaseHandler)
+	http.HandleFunc("/poll", handlers.PollHandler(rm))
+	http.ListenAndServe(":9998", nil)
 }
 
 func init() {

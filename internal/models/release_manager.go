@@ -16,6 +16,7 @@ type Child struct {
 	ID             string      `json:"id"`
 	GeographicArea orb.Polygon `json:"geographic_area"`
 	LastPoll       time.Time   `json:"last_poll"`
+	// TODO: add number of children
 }
 
 type ReleaseManager struct {
