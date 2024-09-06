@@ -1,0 +1,37 @@
+
+name: ReleaseSieveFunction
+type: patch/major/minor
+functions:
+  - name: sieve
+    base_version:
+      path: fns/sieve-gcp
+      env: nodejs
+    new_version:
+      path: fns/sieve-new-gcp
+      env: nodejs
+stages:
+  - name: A/B Test Sieve
+    type: A/B
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 50
+      - name: new_version
+        trafficPercentage: 50 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 15s
+      - name: minCalls
+        threshold: "30"
+rollback:
+  condition:
+    errorRate: "> 0.05" # won't be processed
+    responseTime: "> 300" # won't be processed
+  action:
+    function: base_version
