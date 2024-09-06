@@ -9,22 +9,13 @@ import (
 )
 
 var conf *config.Config
+var rm *models.ReleaseManager
 
 func main() {
-	rm := &models.ReleaseManager{
-		Host: conf.Host,
-		Port: conf.Port,
-		Parent: &models.Parent{
-			Host: conf.Parent.Host,
-			Port: conf.Parent.Port,
-		},
-		Children:       []*models.Child{},
-		GeographicArea: conf.ServiceAreaPolygon,
-	}
-
-	http.HandleFunc("/releases", handlers.ReleaseHandler)
 	http.HandleFunc("/poll", handlers.PollHandler(rm))
-	http.ListenAndServe(":9998", nil)
+	http.HandleFunc("/release", handlers.ReleaseHandler)
+	log.Infof("running api on port %s", conf.Port)
+	http.ListenAndServe(":"+conf.Port, nil)
 }
 
 func init() {
@@ -34,10 +25,23 @@ func init() {
 		log.Fatalf("Error reading config: %v", err)
 	}
 
+	// Log conf
 	ll, err := log.ParseLevel(conf.Loglevel)
 	if err != nil {
-		ll = log.DebugLevel
+		ll = log.InfoLevel
 	}
 	log.SetLevel(ll)
 	log.SetFormatter(&log.TextFormatter{TimestampFormat: "15:04:05.000", FullTimestamp: true})
+
+	// instantiate release manager
+	rm = &models.ReleaseManager{
+		Host: conf.Host,
+		Port: conf.Port,
+		Parent: &models.Parent{
+			Host: conf.Parent.Host,
+			Port: conf.Parent.Port,
+		},
+		Children:       []*models.Child{},
+		GeographicArea: conf.ServiceAreaPolygon,
+	}
 }
