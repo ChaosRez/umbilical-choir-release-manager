@@ -8,8 +8,8 @@ import (
 )
 
 type Parent struct {
-	IPAddress string `json:"ip_address"`
-	Port      string `json:"port"`
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
 
 type Child struct {
@@ -20,12 +20,14 @@ type Child struct {
 }
 
 type ReleaseManager struct {
-	Parent         *Parent     `json:"parent"`
+	Host           string      `yaml:"host"`
+	Port           string      `yaml:"port"`
+	GeographicArea orb.Polygon `yaml:"geographic_area"`
+	Parent         *Parent     `yaml:"parent"`
 	Children       []*Child    `json:"children"`
-	GeographicArea orb.Polygon `json:"geographic_area"`
 }
 
-func (rm *ReleaseManager) ChildNodeCount() int {
+func (rm *ReleaseManager) ChildCount() int {
 	return len(rm.Children)
 }
 func (rm *ReleaseManager) HasChildren() bool {

@@ -59,7 +59,7 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 				LastPoll:       time.Now(),
 			}
 			rm.AddChild(newChild)
-			log.Info("Child count: ", rm.ChildNodeCount())
+			log.Info("updated child count: ", rm.ChildCount())
 		}
 
 		pollResp := PollResponse{ID: pollReq.ID}

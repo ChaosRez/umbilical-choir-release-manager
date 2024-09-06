@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
 	log "github.com/sirupsen/logrus"
@@ -11,11 +12,16 @@ import (
 )
 
 type Config struct {
-	IPAddress          string `yaml:"ip_address"`
-	Port               string `yaml:"port"`
 	Loglevel           string `yaml:"log_level"`
+	Parent             Parent `yaml:"parent"`
 	ServiceArea        string `yaml:"service_area"`
 	ServiceAreaPolygon orb.Polygon
+	Host               string `yaml:"host"`
+	Port               string `yaml:"port"`
+}
+type Parent struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
 
 func ReadConfig(filename string) (*Config, error) {
@@ -30,15 +36,18 @@ func ReadConfig(filename string) (*Config, error) {
 		return nil, err
 	}
 
-	if err := validateIPAddress(config.IPAddress); err != nil {
-		return nil, err
+	if err := validateDefined("Host", config.Host); err != nil {
+		return nil, fmt.Errorf("config validation error: %w", err)
 	}
-	if err := validatePort(config.Port); err != nil {
-		return nil, err
+	if err := validateDefined("Port", config.Port); err != nil {
+		return nil, fmt.Errorf("config validation error: %w", err)
+	}
+	if err := validateDefined("Parent Host", config.Parent.Host); err != nil {
+		log.Warn("Parent host is missing, assuming this is the mother node")
 	}
 	config.ServiceAreaPolygon, err = parseServiceAreaPolygon(config.ServiceArea)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("config validation error: %w", err)
 	}
 
 	log.Info("Successfully read the config file: ", filename)
@@ -46,16 +55,9 @@ func ReadConfig(filename string) (*Config, error) {
 }
 
 // private
-func validateIPAddress(ip string) error {
-	if ip == "" {
-		return errors.New("IP address is missing or empty")
-	}
-	return nil
-}
-
-func validatePort(port string) error {
-	if port == "" {
-		return errors.New("Port is missing or empty")
+func validateDefined(field, str string) error {
+	if str == "" {
+		return errors.New(field + " is missing or empty")
 	}
 	return nil
 }

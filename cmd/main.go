@@ -12,9 +12,11 @@ var conf *config.Config
 
 func main() {
 	rm := &models.ReleaseManager{
+		Host: conf.Host,
+		Port: conf.Port,
 		Parent: &models.Parent{
-			IPAddress: conf.IPAddress,
-			Port:      conf.Port,
+			Host: conf.Parent.Host,
+			Port: conf.Parent.Port,
 		},
 		Children:       []*models.Child{},
 		GeographicArea: conf.ServiceAreaPolygon,

@@ -1,4 +1,7 @@
 log_level: "debug"
-ip_address: "localhost"
+host: "localhost"
 port: "9998"
 service_area: '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"coordinates":[[[13.34138389963175,52.49855383364354],[13.474766810586402,52.49855383364354],[13.474766810586402,52.557371936926614],[13.34138389963175,52.557371936926614],[13.34138389963175,52.49855383364354]]],"type":"Polygon"}}]}'
+parent:
+  host: "localhost"
+  port: "9997"
