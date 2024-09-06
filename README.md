@@ -40,6 +40,8 @@ Sample input:
 Sample output:
 ```json
 {
-	"id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867"
+	"id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867",
+  "new_release": "/release"
 }
 ```
+`new_release` will be empty string if there is no release and will contain the address of the new release if there is one.

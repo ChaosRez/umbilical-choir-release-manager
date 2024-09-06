@@ -12,3 +12,7 @@ func GetLatestRelease() (string, error) {
 	}
 	return releaseFile, nil
 }
+func NewReleaseExists() bool {
+	_, err := os.Stat(releaseFile)
+	return !os.IsNotExist(err)
+}

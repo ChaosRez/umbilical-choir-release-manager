@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 	"umbilical-choir-release-master/internal/models"
+	"umbilical-choir-release-master/internal/repository"
 )
 
 type PollRequest struct {
@@ -19,7 +20,8 @@ type PollRequest struct {
 }
 
 type PollResponse struct {
-	ID string `json:"id"`
+	ID         string `json:"id"`
+	NewRelease string `json:"new_release"`
 }
 
 func parseGeographicArea(geometry geojson.Geometry) (orb.Polygon, error) {
@@ -51,6 +53,7 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 			return
 		}
 
+		// add the child to the release manager, if no id is passed
 		if pollReq.ID == "" {
 			pollReq.ID = uuid.New().String()
 			newChild := &models.Child{
@@ -62,7 +65,16 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 			log.Info("updated child count: ", rm.ChildCount())
 		}
 
-		pollResp := PollResponse{ID: pollReq.ID}
+		// Check if release.yml exists
+		newRelease := ""
+		if repository.NewReleaseExists() {
+			newRelease = "/release"
+		}
+
+		pollResp := PollResponse{
+			ID:         pollReq.ID,
+			NewRelease: newRelease,
+		}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(pollResp); err != nil {
 			log.Errorf("Error encoding response: %v", err)
