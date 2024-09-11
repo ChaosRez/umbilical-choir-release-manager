@@ -38,15 +38,14 @@ func (rm *ReleaseManager) AddChild(child *Child) {
 	rm.updateGeographicArea()
 }
 func (rm *ReleaseManager) AreaToJSON() (string, error) {
-	fc := geojson.NewFeatureCollection()
-	fc.Append(geojson.NewFeature(rm.GeographicArea))
+	gj := geojson.NewGeometry(rm.GeographicArea)
 
-	rawJSON, err := json.Marshal(fc)
+	jsonBlob, err := json.Marshal(gj)
 	if err != nil {
 		return "", err
 	}
 
-	return string(rawJSON), nil
+	return string(jsonBlob), nil
 }
 
 // Private

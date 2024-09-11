@@ -45,3 +45,7 @@ Sample output:
 }
 ```
 `new_release` will be empty string if there is no release and will contain the address of the new release if there is one.
+
+### `/release` endpoint
+The endpoint for the children to download the new release. 
+No input is required. The release will be served as text.
