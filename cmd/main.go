@@ -6,15 +6,17 @@ import (
 	"umbilical-choir-release-master/internal/config"
 	"umbilical-choir-release-master/internal/handlers"
 	"umbilical-choir-release-master/internal/models"
+	"umbilical-choir-release-master/internal/storage"
 )
 
 var conf *config.Config
 var rm *models.ReleaseManager
+var rs *storage.ResultStorage
 
 func main() {
 	http.HandleFunc("/poll", handlers.PollHandler(rm))
 	http.HandleFunc("/release", handlers.ReleaseHandler)
-	http.HandleFunc("/result", handlers.ResultHandler(rm))
+	http.HandleFunc("/result", handlers.ResultHandler(rs))
 	log.Infof("running api on port %s", conf.Port)
 	http.ListenAndServe(":"+conf.Port, nil)
 }
@@ -45,4 +47,6 @@ func init() {
 		Children:       []*models.Child{},
 		GeographicArea: conf.ServiceAreaPolygon,
 	}
+	// instantiate result storage
+	rs = storage.NewResultStorage()
 }

@@ -15,7 +15,7 @@ type ResultSummary struct {
 }
 
 type ResultRequest struct {
-	ID             string        `json:"id"`
+	ChildID        string        `json:"id"`
 	ReleaseID      string        `json:"release_id"`
 	ReleaseSummary ResultSummary `json:"release_summary"`
 }
