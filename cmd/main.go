@@ -14,6 +14,7 @@ var rm *models.ReleaseManager
 func main() {
 	http.HandleFunc("/poll", handlers.PollHandler(rm))
 	http.HandleFunc("/release", handlers.ReleaseHandler)
+	http.HandleFunc("/result", handlers.ResultHandler(rm))
 	log.Infof("running api on port %s", conf.Port)
 	http.ListenAndServe(":"+conf.Port, nil)
 }
