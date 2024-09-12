@@ -16,7 +16,9 @@ var rs *storage.ResultStorage
 func main() {
 	http.HandleFunc("/poll", handlers.PollHandler(rm))
 	http.HandleFunc("/release", handlers.ReleaseHandler)
+	http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
 	http.HandleFunc("/result", handlers.ResultHandler(rs))
+
 	log.Infof("running api on port %s", conf.Port)
 	http.ListenAndServe(":"+conf.Port, nil)
 }

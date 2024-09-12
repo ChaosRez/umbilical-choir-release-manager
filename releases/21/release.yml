@@ -4,10 +4,10 @@ type: patch/major/minor
 functions:
   - name: sieve
     base_version:
-      path: fns/sieve-gcp
+      path: fns/sample_f1
       env: nodejs
     new_version:
-      path: fns/sieve-new-gcp
+      path: fns/sample_f2
       env: nodejs
 stages:
   - name: A/B Test Sieve
