@@ -32,7 +32,7 @@ func ResultHandler(rs *storage.ResultStorage) http.HandlerFunc {
 		_, exists := rs.GetResult(resultReq.ChildID, resultReq.ReleaseID)
 		if !exists {
 			log.Errorf("Error getting result from db (read-your-write) for the pair: %s : %s", resultReq.ChildID, resultReq.ReleaseID)
-			http.Error(w, "Error getting result", http.StatusInternalServerError)
+			http.Error(w, "Error saving the result", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
