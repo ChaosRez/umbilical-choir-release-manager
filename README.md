@@ -55,6 +55,7 @@ The endpoint for the children to download the functions of the new release.
 The `release_id` is the id of the release that the child want to download the functions of.
 It will return a zip file containing the functions of the release.
 Each function is in a folder that is defined in the release file.
+There is a `fns.zip` that contains `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format.
 
 ### `/result` endpoint
 The endpoint for the children to send the summary results of a release.
@@ -74,6 +75,3 @@ Sample input:
 }
 ```
 
-### Note
-Sample function:
-there is a `fns.zip` that contains `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format which is just for test.
