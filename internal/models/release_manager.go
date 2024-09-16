@@ -22,7 +22,7 @@ type Child struct {
 type ReleaseManager struct {
 	Host           string      `yaml:"host"`
 	Port           string      `yaml:"port"`
-	GeographicArea orb.Polygon `yaml:"geographic_area"`
+	GeographicArea orb.Polygon `yaml:"geographic_area"` // FIXME: is optional, therefore can cause problem for its parent. can start polling after registering a child
 	Parent         *Parent     `yaml:"parent"`
 	Children       []*Child    `json:"children"`
 }

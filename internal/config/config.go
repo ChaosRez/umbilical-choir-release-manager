@@ -45,9 +45,14 @@ func ReadConfig(filename string) (*Config, error) {
 	if err := validateDefined("Parent Host", config.Parent.Host); err != nil {
 		log.Warn("Parent host is missing, assuming this is the mother node")
 	}
-	config.ServiceAreaPolygon, err = parseServiceAreaPolygon(config.ServiceArea)
-	if err != nil {
-		return nil, fmt.Errorf("config validation error: %w", err)
+	if config.ServiceArea != "" {
+		config.ServiceAreaPolygon, err = parseServiceAreaPolygon(config.ServiceArea)
+		if err != nil {
+			return nil, fmt.Errorf("config validation error: %w", err)
+		}
+	} else {
+		config.ServiceAreaPolygon = orb.Polygon{}
+		log.Warn("Service area is not defined, using an empty polygon")
 	}
 
 	log.Info("Successfully read the config file: ", filename)

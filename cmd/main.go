@@ -47,7 +47,7 @@ func init() {
 			Port: conf.Parent.Port,
 		},
 		Children:       []*models.Child{},
-		GeographicArea: conf.ServiceAreaPolygon,
+		GeographicArea: conf.ServiceAreaPolygon, // FIXME: if not leaf, setting this will be union by other children
 	}
 	// instantiate result storage
 	rs = storage.NewResultStorage()
