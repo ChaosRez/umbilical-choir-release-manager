@@ -29,9 +29,9 @@ stages:
         threshold: 15s
       - name: minCalls
         threshold: "30"
+    end_action:
+      onSuccess: rollout
+      onFailure: rollback
 rollback:
-  condition:
-    errorRate: "> 0.05" # won't be processed
-    responseTime: "> 300" # won't be processed
   action:
     function: base_version
