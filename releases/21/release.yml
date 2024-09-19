@@ -10,6 +10,28 @@ functions:
       path: fns/sample_f2
       env: nodejs
 stages:
+  - name: Canary test sieve
+    type: A/B # TODO remove type? or modify
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 80
+      - name: new_version
+        trafficPercentage: 20 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 15s
+      - name: minCalls
+        threshold: "30"
+    end_action:
+      onSuccess: A/B Test Sieve
+      onFailure: rollback
   - name: A/B Test Sieve
     type: A/B
     func_name: sieve

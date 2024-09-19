@@ -27,7 +27,7 @@ type PollResponse struct {
 func parseGeographicArea(geometry geojson.Geometry) (orb.Polygon, error) {
 	polygon, ok := geometry.Geometry().(orb.Polygon)
 	if !ok {
-		return nil, errors.New("Geographic area is not a valid polygon")
+		return nil, errors.New("geographic area is not a valid polygon")
 	}
 	return polygon, nil
 }

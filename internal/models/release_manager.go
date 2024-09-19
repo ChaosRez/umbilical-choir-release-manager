@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -56,5 +57,7 @@ func (rm *ReleaseManager) updateGeographicArea() {
 	for _, child := range rm.Children {
 		multiPolygon = append(multiPolygon, child.GeographicArea)
 	}
-	rm.GeographicArea = multiPolygon.Bound().ToPolygon() // TODO: check if it is same as the union of polygons
+	rm.GeographicArea = multiPolygon.Bound().ToPolygon() // TODO: validate it is same as the union of polygons
+	areaJSON, _ := rm.AreaToJSON()
+	log.Debugf("Updated geographic area:\n%v", areaJSON)
 }

@@ -8,6 +8,7 @@ import (
 
 const latestReleaseFile = "releases/21/release.yml"
 
+// TODO: check if both fns.zip file and release.yml file exist
 func GetLatestRelease() (string, error) {
 	if _, err := os.Stat(latestReleaseFile); os.IsNotExist(err) {
 		return "", err
