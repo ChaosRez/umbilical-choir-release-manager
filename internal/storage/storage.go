@@ -23,12 +23,23 @@ func (rs *ResultStorage) StoreResult(result models.ResultRequest) error {
 	defer rs.mu.Unlock()
 
 	key := rs.generateKey(result.ChildID, result.ReleaseID)
-	if _, exists := rs.storage[key]; exists {
-		return fmt.Errorf("result for ChildID %s and ReleaseID %s already exists", result.ChildID, result.ReleaseID)
+	existingResult, exists := rs.storage[key]
+	if !exists {
+		rs.storage[key] = result
+		log.Infof("Release result for stage '%v' (%v) for ChildID: %s has been stored", result.ReleaseSummaries[0].StageName, result.ReleaseID, result.ChildID)
+		return nil
 	}
 
-	rs.storage[key] = result
-	log.Info("Stored result for ChildID: ", result.ChildID)
+	for _, newSummary := range result.ReleaseSummaries {
+		if !rs.containsSummary(existingResult.ReleaseSummaries, newSummary) {
+			existingResult.ReleaseSummaries = append(existingResult.ReleaseSummaries, newSummary)
+		} else {
+			log.Errorf("Summary for stage '%v' already exists in the result, client '%v'", newSummary.StageName, result.ChildID)
+		}
+	}
+
+	rs.storage[key] = existingResult // update the result
+	log.Infof("Updated result for ChildID: %v (release id: %v, recived results: %v)", result.ChildID, result.ReleaseID, len(existingResult.ReleaseSummaries))
 	return nil
 }
 
@@ -45,4 +56,14 @@ func (rs *ResultStorage) GetResult(childID, releaseID string) (models.ResultRequ
 // helper function to generate a key for the storage map
 func (rs *ResultStorage) generateKey(childID, releaseID string) string {
 	return fmt.Sprintf("%s:%s", childID, releaseID)
+}
+
+// helper function to check if a summary already exists in the list
+func (rs *ResultStorage) containsSummary(summaries []models.ResultSummary, summary models.ResultSummary) bool {
+	for _, s := range summaries {
+		if s.StageName == summary.StageName {
+			return true
+		}
+	}
+	return false
 }

@@ -1,21 +1,22 @@
 package models
 
 type TimeSummary struct {
-	Median  float64
-	Minimum float64
-	Maximum float64
+	Median  float64 `json:"median"`
+	Minimum float64 `json:"minimum"`
+	Maximum float64 `json:"maximum"`
 }
 
 type ResultSummary struct {
-	ProxyTimes     TimeSummary
-	F1TimesSummary TimeSummary
-	F2TimesSummary TimeSummary
-	F1ErrRate      float64
-	F2ErrRate      float64
+	StageName      string      `json:"stage_name"`
+	ProxyTimes     TimeSummary `json:"proxy_times"`
+	F1TimesSummary TimeSummary `json:"f1_times_summary"`
+	F2TimesSummary TimeSummary `json:"f2_times_summary"`
+	F1ErrRate      float64     `json:"f1_err_rate"`
+	F2ErrRate      float64     `json:"f2_err_rate"`
 }
 
 type ResultRequest struct {
-	ChildID        string        `json:"id"`
-	ReleaseID      string        `json:"release_id"`
-	ReleaseSummary ResultSummary `json:"release_summary"`
+	ChildID          string          `json:"id"`
+	ReleaseID        string          `json:"release_id"`
+	ReleaseSummaries []ResultSummary `json:"release_summaries"`
 }
