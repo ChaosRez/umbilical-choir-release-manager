@@ -6,13 +6,14 @@ type TimeSummary struct {
 	Maximum float64 `json:"maximum"`
 }
 
-type ResultSummary struct {
+type ResultSummary struct { // TODO: rename to stage summary/result
 	StageName      string      `json:"stage_name"`
 	ProxyTimes     TimeSummary `json:"proxy_times"`
 	F1TimesSummary TimeSummary `json:"f1_times_summary"`
 	F2TimesSummary TimeSummary `json:"f2_times_summary"`
 	F1ErrRate      float64     `json:"f1_err_rate"`
 	F2ErrRate      float64     `json:"f2_err_rate"`
+	Status         string      `json:"status"` // success, failure, or error
 }
 
 type ResultRequest struct {

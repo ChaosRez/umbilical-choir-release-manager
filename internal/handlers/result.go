@@ -20,7 +20,7 @@ func ResultHandler(rs *storage.ResultStorage) http.HandlerFunc {
 			return
 		}
 
-		log.Infof("Received result from ChildID: %s (release id: %v)", resultReq.ChildID, resultReq.ReleaseID)
+		log.Infof("Received result (%s) from ChildID: %s (release id: %v, stage: %s)", resultReq.ReleaseSummaries[0].Status, resultReq.ChildID, resultReq.ReleaseID, resultReq.ReleaseSummaries[0].StageName)
 
 		if resultReq.ReleaseSummaries == nil || len(resultReq.ReleaseSummaries) == 0 {
 			log.Errorf("ReleaseSummaries is missing or empty in the request")

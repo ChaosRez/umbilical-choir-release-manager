@@ -26,7 +26,7 @@ func (rs *ResultStorage) StoreResult(result models.ResultRequest) error {
 	existingResult, exists := rs.storage[key]
 	if !exists {
 		rs.storage[key] = result
-		log.Infof("Release result for stage '%v' (%v) for ChildID: %s has been stored", result.ReleaseSummaries[0].StageName, result.ReleaseID, result.ChildID)
+		log.Infof("Release result for the First stage '%v' (%v) for ChildID: %s has been stored", result.ReleaseSummaries[0].StageName, result.ReleaseID, result.ChildID)
 		return nil
 	}
 
@@ -39,7 +39,11 @@ func (rs *ResultStorage) StoreResult(result models.ResultRequest) error {
 	}
 
 	rs.storage[key] = existingResult // update the result
-	log.Infof("Updated result for ChildID: %v (release id: %v, recived results: %v)", result.ChildID, result.ReleaseID, len(existingResult.ReleaseSummaries))
+	var names []string
+	for _, summary := range existingResult.ReleaseSummaries {
+		names = append(names, summary.StageName)
+	}
+	log.Infof("Result updated for ChildID: %v (Release ID: %v, Number of received results: %v, Stages: %v)", result.ChildID, result.ReleaseID, len(existingResult.ReleaseSummaries), names)
 	return nil
 }
 
