@@ -24,14 +24,6 @@ type PollResponse struct {
 	NewRelease string `json:"new_release"`
 }
 
-func parseGeographicArea(geometry geojson.Geometry) (orb.Polygon, error) {
-	polygon, ok := geometry.Geometry().(orb.Polygon)
-	if !ok {
-		return nil, errors.New("geographic area is not a valid polygon")
-	}
-	return polygon, nil
-}
-
 func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var pollReq PollRequest
@@ -80,4 +72,12 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 			log.Errorf("Error encoding response: %v", err)
 		}
 	}
+}
+
+func parseGeographicArea(geometry geojson.Geometry) (orb.Polygon, error) {
+	polygon, ok := geometry.Geometry().(orb.Polygon)
+	if !ok {
+		return nil, errors.New("geographic area is not a valid polygon")
+	}
+	return polygon, nil
 }
