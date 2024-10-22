@@ -51,11 +51,11 @@ The endpoint for the children to download a specific release (usually given by t
 releaseID and (child) ID should be passed as GET parameters. The release will be served as text.
 
 ### `/release/functions/{release_id}` endpoint
-The endpoint for the children to download the functions of the new release.
-The `release_id` is the id of the release that the child want to download the functions of.
-It will return a zip file containing the functions of the release.
-Each function is in a folder that is defined in the release file.
-There is a sample `fns.zip` (zip name matters) that contains `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format.
+This endpoint allows children to download the functions associated with a specific release.
+The `release_id` parameter specifies the release for which the functions are being requested.
+It returns a `fns.zip` file containing the functions of the specified release.
+Each function is stored in a separate folder as defined in the release file.
+A sample `fns.zip` file (name matters) includes `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format.
 
 ### `/result` endpoint
 The endpoint for the children to send the summary results of a release.
