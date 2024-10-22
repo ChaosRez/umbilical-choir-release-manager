@@ -9,6 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
 type Config struct {
@@ -57,6 +59,25 @@ func ReadConfig(filename string) (*Config, error) {
 
 	log.Info("Successfully read the config file: ", filename)
 	return &config, nil
+}
+
+// Set logger's level (from config) and format
+func InitLogger(logLevel string) {
+	ll, err := log.ParseLevel(logLevel)
+	if err != nil {
+		ll = log.InfoLevel
+	}
+	log.SetLevel(ll)
+
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{
+		TimestampFormat: "15:04:05.000",
+		FullTimestamp:   false,
+		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+			_, file := filepath.Split(f.File)
+			return "", fmt.Sprintf(" %s:%d", file, f.Line)
+		},
+	})
 }
 
 // private

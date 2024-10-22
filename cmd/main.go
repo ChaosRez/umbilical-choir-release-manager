@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"path/filepath"
-	"runtime"
 	"time"
 	"umbilical-choir-release-master/internal/config"
 	"umbilical-choir-release-master/internal/handlers"
@@ -54,21 +51,8 @@ func init() {
 		log.Fatalf("Error reading config: %v", err)
 	}
 
-	// Log conf
-	ll, err := log.ParseLevel(conf.Loglevel)
-	if err != nil {
-		ll = log.InfoLevel
-	}
-	log.SetLevel(ll)
-	log.SetReportCaller(true)
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "15:04:05.000",
-		FullTimestamp:   false,
-		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
-			_, file := filepath.Split(f.File)
-			return "", fmt.Sprintf(" %s:%d", file, f.Line)
-		},
-	})
+	// Log initialization
+	config.InitLogger(conf.Loglevel)
 
 	// instantiate release manager
 	rm = &models.ReleaseManager{
