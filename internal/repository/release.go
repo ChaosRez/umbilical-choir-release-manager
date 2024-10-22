@@ -6,18 +6,13 @@ import (
 	"path/filepath"
 )
 
-const latestReleaseFile = "releases/21/release.yml"
-
 // TODO: check if both fns.zip file and release.yml file exist
-func GetLatestRelease() (string, error) {
-	if _, err := os.Stat(latestReleaseFile); os.IsNotExist(err) {
+func GetReleaseInstruct(releaseID string) (string, error) {
+	releasePath := filepath.Join("releases", releaseID, "release.yml")
+	if _, err := os.Stat(releasePath); os.IsNotExist(err) {
 		return "", err
 	}
-	return latestReleaseFile, nil
-}
-func NewReleaseExists() bool {
-	_, err := os.Stat(latestReleaseFile)
-	return !os.IsNotExist(err)
+	return releasePath, nil
 }
 
 func GetFnsZipPath(releaseID string) (string, error) {

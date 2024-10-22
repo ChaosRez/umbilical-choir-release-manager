@@ -31,7 +31,7 @@ func ReleaseHandler(rm *models.ReleaseManager) http.HandlerFunc {
 			return
 		}
 
-		releaseFile, err := repository.GetLatestRelease() // TODO ask for a specific release
+		releaseFile, err := repository.GetReleaseInstruct(releaseID)
 		if err != nil {
 			log.Errorf("Error getting latest release: %v", err)
 			http.Error(w, "No release found", http.StatusNotFound)

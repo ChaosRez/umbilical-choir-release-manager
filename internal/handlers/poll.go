@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"time"
 	"umbilical-choir-release-master/internal/models"
-	"umbilical-choir-release-master/internal/repository"
 )
 
 type PollRequest struct {
@@ -61,10 +60,7 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 		newRelease := ""
 		releaseID, anyReleaseForChild := rm.GetReleaseForChild(pollReq.ID) // FIXME: the child can join after a release and won't be considered for release
 		if anyReleaseForChild {
-			// TODO: update repository's NewReleaseExists
-			if repository.NewReleaseExists() {
-				newRelease = releaseID
-			}
+			newRelease = releaseID
 		} else {
 			log.Debugf("No release found for this Child ID %s", pollReq.ID)
 		}
