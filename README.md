@@ -41,21 +41,21 @@ Sample output:
 ```json
 {
 	"id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867",
-  "new_release": "/release"
+  "new_release": "<releaseID>"
 }
 ```
-`new_release` will be empty string if there is no release and will contain the address of the new release if there is one.
+`new_release` will be empty string if there is no release for the client (child) and will contain the ID of the (first) new release if there is one.
 
-### `/release` endpoint
-The endpoint for the children to download the new release. 
-No input is required. The release will be served as text.
+### `/release?childID=<ID>&releaseID=<releaseID>` endpoint
+The endpoint for the children to download a specific release (usually given by the /poll endpoint).
+releaseID and (child) ID should be passed as GET parameters. The release will be served as text.
 
 ### `/release/functions/{release_id}` endpoint
 The endpoint for the children to download the functions of the new release.
 The `release_id` is the id of the release that the child want to download the functions of.
 It will return a zip file containing the functions of the release.
 Each function is in a folder that is defined in the release file.
-There is a `fns.zip` that contains `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format.
+There is a sample `fns.zip` (zip name matters) that contains `fns/sample_f1` and `fns/sample_f2` functions in tinyfaas format.
 
 ### `/result` endpoint
 The endpoint for the children to send the summary results of a release.
