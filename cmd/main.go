@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"path/filepath"
+	"runtime"
+	"time"
 	"umbilical-choir-release-master/internal/config"
 	"umbilical-choir-release-master/internal/handlers"
 	"umbilical-choir-release-master/internal/models"
@@ -56,7 +60,15 @@ func init() {
 		ll = log.InfoLevel
 	}
 	log.SetLevel(ll)
-	log.SetFormatter(&log.TextFormatter{TimestampFormat: "15:04:05.000", FullTimestamp: true})
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{
+		TimestampFormat: "15:04:05.000",
+		FullTimestamp:   false,
+		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+			_, file := filepath.Split(f.File)
+			return "", fmt.Sprintf(" %s:%d", file, f.Line)
+		},
+	})
 
 	// instantiate release manager
 	rm = &models.ReleaseManager{
