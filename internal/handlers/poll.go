@@ -59,8 +59,14 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 
 		// Check if release.yml exists
 		newRelease := ""
-		if repository.NewReleaseExists() {
-			newRelease = "/release"
+		releaseID, anyReleaseForChild := rm.GetReleaseForChild(pollReq.ID) // FIXME: the child can join after a release and won't be considered for release
+		if anyReleaseForChild {
+			// TODO: update repository's NewReleaseExists
+			if repository.NewReleaseExists() {
+				newRelease = releaseID
+			}
+		} else {
+			log.Debugf("No release found for this Child ID %s", pollReq.ID)
 		}
 
 		pollResp := PollResponse{

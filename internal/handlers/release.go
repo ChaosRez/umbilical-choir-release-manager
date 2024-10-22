@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
+	"umbilical-choir-release-master/internal/models"
 
 	"umbilical-choir-release-master/internal/repository"
 )
@@ -14,18 +15,32 @@ var releaseHandlerCounter uint64
 var functionsHandlerCounter uint64
 
 // ReleaseHandler serves the latest release.yml file
-func ReleaseHandler(w http.ResponseWriter, r *http.Request) {
-	atomic.AddUint64(&releaseHandlerCounter, 1)
-	log.Debugf("ReleaseHandler called %d times", atomic.LoadUint64(&releaseHandlerCounter))
+func ReleaseHandler(rm *models.ReleaseManager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		atomic.AddUint64(&releaseHandlerCounter, 1)
+		log.Debugf("ReleaseHandler called %d times", atomic.LoadUint64(&releaseHandlerCounter))
 
-	releaseFile, err := repository.GetLatestRelease()
-	if err != nil {
-		log.Errorf("Error getting latest release: %v", err)
-		http.Error(w, "No release found", http.StatusNotFound)
-		return
+		// Extract releaseID and childID from query parameters
+		releaseID := r.URL.Query().Get("releaseID")
+		childID := r.URL.Query().Get("childID")
+		log.Debugf("Release ID: %s, Child ID: %s", releaseID, childID)
+
+		// Check if releaseID and childID are provided
+		if releaseID == "" || childID == "" {
+			http.Error(w, "Release ID or Child ID not specified", http.StatusBadRequest)
+			return
+		}
+
+		releaseFile, err := repository.GetLatestRelease() // TODO ask for a specific release
+		if err != nil {
+			log.Errorf("Error getting latest release: %v", err)
+			http.Error(w, "No release found", http.StatusNotFound)
+			return
+		}
+
+		rm.ClearNotification(releaseID, childID)
+		http.ServeFile(w, r, filepath.Join(".", releaseFile))
 	}
-
-	http.ServeFile(w, r, filepath.Join(".", releaseFile))
 }
 
 // FunctionsHandler serves the fns.zip file for a given release ID

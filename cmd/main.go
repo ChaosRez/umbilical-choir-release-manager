@@ -14,13 +14,33 @@ var rm *models.ReleaseManager
 var rs *storage.ResultStorage
 
 func main() {
-	http.HandleFunc("/poll", handlers.PollHandler(rm))
-	http.HandleFunc("/release", handlers.ReleaseHandler)
-	http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
-	http.HandleFunc("/result", handlers.ResultHandler(rs))
+	// Serve handlers in a separate goroutine
+	go func() {
+		http.HandleFunc("/poll", handlers.PollHandler(rm))
+		http.HandleFunc("/release", handlers.ReleaseHandler(rm))
+		http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
+		http.HandleFunc("/result", handlers.ResultHandler(rs))
 
-	log.Infof("running api on port %s", conf.Port)
-	http.ListenAndServe(":"+conf.Port, nil)
+		log.Infof("running api on port %s", conf.Port)
+		if err := http.ListenAndServe(":"+conf.Port, nil); err != nil {
+			log.Fatalf("Server failed: %v", err)
+		}
+	}()
+
+	// TODO: simulate a canary
+	// Check for children every 5 seconds
+	time.Sleep(5 * time.Second)
+	for {
+		if len(rm.Children) > 0 {
+			log.Infof("First child ID: %s", rm.Children[0].ID)
+			rm.MarkChildForNotification("21", rm.Children[0].ID)
+			break
+		} else {
+			log.Infof("No children found, retrying in 5 seconds...")
+			time.Sleep(5 * time.Second)
+		}
+	}
+	time.Sleep(1000 * time.Second)
 }
 
 func init() {

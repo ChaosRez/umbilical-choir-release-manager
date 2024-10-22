@@ -21,11 +21,12 @@ type Child struct {
 }
 
 type ReleaseManager struct {
-	Host           string      `yaml:"host"`
-	Port           string      `yaml:"port"`
-	GeographicArea orb.Polygon `yaml:"geographic_area"` // FIXME: is optional, therefore can cause problem for its parent. can start polling after registering a child
-	Parent         *Parent     `yaml:"parent"`
-	Children       []*Child    `json:"children"`
+	Host                 string              `yaml:"host"`
+	Port                 string              `yaml:"port"`
+	GeographicArea       orb.Polygon         `yaml:"geographic_area"`
+	Parent               *Parent             `yaml:"parent"`
+	Children             []*Child            `json:"children"`
+	ReleaseNotifications map[string][]string // track children to notify for a release
 }
 
 func (rm *ReleaseManager) ChildCount() int {
@@ -37,6 +38,48 @@ func (rm *ReleaseManager) HasChildren() bool {
 func (rm *ReleaseManager) AddChild(child *Child) {
 	rm.Children = append(rm.Children, child)
 	rm.updateGeographicArea()
+}
+func (rm *ReleaseManager) MarkChildForNotification(releaseNumber, childID string) {
+	if rm.ReleaseNotifications == nil {
+		rm.ReleaseNotifications = make(map[string][]string)
+	}
+	rm.ReleaseNotifications[releaseNumber] = append(rm.ReleaseNotifications[releaseNumber], childID)
+	log.Infof("Marked child %s for release %s", childID, releaseNumber)
+}
+
+// GetReleaseForChild returns the (first) release number for a child, if it exists
+func (rm *ReleaseManager) GetReleaseForChild(childID string) (string, bool) {
+	for releaseNumber, children := range rm.ReleaseNotifications {
+		for _, id := range children {
+			if id == childID {
+				return releaseNumber, true
+			}
+		}
+	}
+	return "", false
+}
+func (rm *ReleaseManager) ClearNotification(releaseNumber, childID string) {
+	children, exists := rm.ReleaseNotifications[releaseNumber]
+	if !exists {
+		log.Errorf("release '%s' not found in ReleaseNotifications to be cleared", releaseNumber)
+		return
+	}
+	childFound := false
+	for i, id := range children {
+		if id == childID {
+			rm.ReleaseNotifications[releaseNumber] = append(children[:i], children[i+1:]...)
+			log.Infof("Cleared notification for child %s in release %s", childID, releaseNumber)
+			childFound = true
+			break
+		}
+	}
+	if !childFound {
+		log.Errorf("child '%s' not found for release '%s' to be cleared", childID, releaseNumber)
+	} else {
+		if len(rm.ReleaseNotifications[releaseNumber]) == 0 { // if no more children to notify, remove the release
+			delete(rm.ReleaseNotifications, releaseNumber)
+		}
+	}
 }
 func (rm *ReleaseManager) AreaToJSON() (string, error) {
 	gj := geojson.NewGeometry(rm.GeographicArea)
