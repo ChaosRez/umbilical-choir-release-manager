@@ -20,6 +20,7 @@ func main() {
 		http.HandleFunc("/poll", handlers.PollHandler(rm))
 		http.HandleFunc("/release", handlers.ReleaseHandler(rm))
 		http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
+		http.HandleFunc("/end_stage", handlers.EndStageHandler(rm))
 		http.HandleFunc("/result", handlers.ResultHandler(rs))
 
 		log.Infof("running api on port %s", conf.Port)

@@ -75,3 +75,20 @@ Sample input:
 }
 ```
 
+### `/end_stage` endpoint
+The endpoint for the children to poll for an end of a stage signal, for the stages of type `WaitForSignal`.
+Sample input:
+```json
+{
+    "id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867",
+    "strategy_id": 21,
+    "stage_name": "Canary Sieve Function"
+}
+```
+Sample output:
+```json
+{
+    "end_stage": true
+}
+```
+
