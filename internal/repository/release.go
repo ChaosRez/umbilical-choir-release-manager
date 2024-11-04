@@ -7,7 +7,7 @@ import (
 )
 
 // TODO: check if both fns.zip file and release.yml file exist
-func GetReleaseInstruct(releaseID string) (string, error) {
+func ReadRelease(releaseID string) (string, error) {
 	releasePath := filepath.Join("releases", releaseID, "release.yml")
 	if _, err := os.Stat(releasePath); os.IsNotExist(err) {
 		return "", err

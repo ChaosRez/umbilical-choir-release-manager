@@ -62,7 +62,7 @@ func PollHandler(rm *models.ReleaseManager) http.HandlerFunc {
 		if anyReleaseForChild {
 			newRelease = releaseID
 		} else {
-			log.Debugf("No release found for this Child ID %s", pollReq.ID)
+			log.Debugf("No pending release found for this Child ID %s", pollReq.ID)
 		}
 
 		pollResp := PollResponse{

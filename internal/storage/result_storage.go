@@ -31,7 +31,7 @@ func (rs *ResultStorage) StoreResult(result models.ResultRequest) error {
 	}
 
 	for _, newSummary := range result.ReleaseSummaries {
-		if !rs.containsSummary(existingResult.ReleaseSummaries, newSummary) {
+		if !rs.summaryAlreadyExists(existingResult.ReleaseSummaries, newSummary) {
 			existingResult.ReleaseSummaries = append(existingResult.ReleaseSummaries, newSummary)
 		} else {
 			log.Errorf("Summary for stage '%v' already exists in the result, client '%v'", newSummary.StageName, result.ChildID)
@@ -63,7 +63,7 @@ func (rs *ResultStorage) generateKey(childID, releaseID string) string {
 }
 
 // helper function to check if a summary already exists in the list
-func (rs *ResultStorage) containsSummary(summaries []models.ResultSummary, summary models.ResultSummary) bool {
+func (rs *ResultStorage) summaryAlreadyExists(summaries []models.ResultSummary, summary models.ResultSummary) bool {
 	for _, s := range summaries {
 		if s.StageName == summary.StageName {
 			return true
