@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
-	"umbilical-choir-release-master/internal/models"
+	"umbilical-choir-release-master/internal/release_manager"
 
 	"umbilical-choir-release-master/internal/repository"
 )
@@ -15,7 +15,7 @@ var releaseHandlerCounter uint64
 var functionsHandlerCounter uint64
 
 // ReleaseHandler serves the latest release.yml file
-func ReleaseHandler(rm *models.ReleaseManager) http.HandlerFunc {
+func ReleaseHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddUint64(&releaseHandlerCounter, 1)
 		log.Debugf("ReleaseHandler called %d times", atomic.LoadUint64(&releaseHandlerCounter))
@@ -31,14 +31,14 @@ func ReleaseHandler(rm *models.ReleaseManager) http.HandlerFunc {
 			return
 		}
 
-		releaseFile, err := repository.GetReleaseInstruct(releaseID)
+		releaseFile, err := repository.ReadRelease(releaseID)
 		if err != nil {
-			log.Errorf("Error getting latest release: %v", err)
-			http.Error(w, "No release found", http.StatusNotFound)
+			log.Errorf("Error getting the release %s: %v", releaseID, err)
+			http.Error(w, "Release not found", http.StatusNotFound)
 			return
 		}
 
-		rm.ClearNotification(releaseID, childID)
+		rm.MarkChildAsNotified(releaseID, childID)
 		http.ServeFile(w, r, filepath.Join(".", releaseFile))
 	}
 }

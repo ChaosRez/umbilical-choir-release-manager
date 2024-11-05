@@ -7,11 +7,12 @@ import (
 	"umbilical-choir-release-master/internal/config"
 	"umbilical-choir-release-master/internal/handlers"
 	"umbilical-choir-release-master/internal/models"
+	"umbilical-choir-release-master/internal/release_manager"
 	"umbilical-choir-release-master/internal/storage"
 )
 
 var conf *config.Config
-var rm *models.ReleaseManager
+var rm *release_manager.ReleaseManager
 var rs *storage.ResultStorage
 
 func main() {
@@ -29,19 +30,31 @@ func main() {
 		}
 	}()
 
+	mainRelease := storage.Release{
+		ID:          "21",
+		Name:        "ReleaseSieveFunction",
+		Type:        "major",
+		Functions:   []string{"sieve"},
+		ChildStatus: map[string]models.ReleaseStatus{},
+		StageNames:  []string{"Canary test sieve", "A/B Test Sieve"},
+	}
+	rm.Releases.AddRelease(mainRelease)
 	// TODO: simulate a canary
 	// Check for children every 5 seconds
 	time.Sleep(5 * time.Second)
 	for {
 		if len(rm.Children) > 0 {
 			log.Infof("First child ID: %s", rm.Children[0].ID)
-			rm.MarkChildForNotification("21", rm.Children[0].ID)
+			//rm.Releases.MarkChildAsTodo("21", rm.Children[0].ID)
+			rm.RegisterChildForRelease("21", rm.Children[0].ID, &mainRelease)
 			break
 		} else {
 			log.Infof("No children found, retrying in 5 seconds...")
 			time.Sleep(5 * time.Second)
 		}
 	}
+	time.Sleep(30 * time.Second)
+	rm.StageStatusTracker.UpdateStatus(mainRelease.ID, "Canary test sieve", rm.Children[0].ID, models.ShouldEnd)
 	time.Sleep(1000 * time.Second)
 }
 
@@ -56,15 +69,17 @@ func init() {
 	config.InitLogger(conf.Loglevel)
 
 	// instantiate release manager
-	rm = &models.ReleaseManager{
+	rm = &release_manager.ReleaseManager{
 		Host: conf.Host,
 		Port: conf.Port,
 		Parent: &models.Parent{
 			Host: conf.Parent.Host,
 			Port: conf.Parent.Port,
 		},
-		Children:       []*models.Child{},
-		GeographicArea: conf.ServiceAreaPolygon, // FIXME: if not leaf, setting this will be union by other children
+		Children:           []*models.Child{},
+		GeographicArea:     conf.ServiceAreaPolygon, // FIXME: if not a leaf, set this to union of children
+		StageStatusTracker: storage.NewStageStatusTracker(),
+		Releases:           storage.NewReleases(),
 	}
 	// instantiate result storage
 	rs = storage.NewResultStorage()

@@ -92,3 +92,25 @@ Sample output:
 }
 ```
 
+## Status codes
+Here is a status description for `ReleaseStatus` and `StageStatus` (enums):
+
+### ReleaseStatus
+state of a specific release (strategy) for a child:
+- **No**: The child should not get the release instruction.
+- **Todo**: Marked to get the release.
+- **Doing**: The child is notified of the release.
+- **Done**: The child has completed all stages.
+- **Failed**: The release has failed.
+
+### StageStatus
+state of stages of a release for a child:
+
+- **Pending**: The stage is pending.
+- **InProgress**: The child is notified and the stage is in progress.
+- **ShouldEnd**: Only for `WaitForSignal` stage type. The child polls for it on `/end_stage` to finish a stage.
+- **WaitingForResult**: Either after `ShouldEnd` or after `InProgress` (may stay at `InProgress` and jump to `Completed`).
+- **Completed**: The stage result has been received and the stage is completed.
+- **Failure**: The stage result has been received as a failure.
+- **Error**: The stage result has been received as an error.
+
