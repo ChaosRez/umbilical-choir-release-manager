@@ -41,6 +41,7 @@ func EndStageHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 			EndStage: result >= models.ShouldEnd, // if the stage is ShouldEnd or higher, end the stage
 		}
 
+		//log.Debugf("result: %s, end_stage: %v, childID: %s", result, response.EndStage, req.ID)
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Errorf("Error encoding response: %v", err)
