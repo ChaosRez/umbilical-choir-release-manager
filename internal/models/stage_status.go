@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type StageStatus int
 
 type StageStatusKey struct {
@@ -17,3 +19,21 @@ const (
 	Failure                             // received the stage result as Failure
 	Error                               // received the stage result as Error
 )
+
+var stageStatusLabels = []string{
+	"Pending",
+	"InProgress",
+	"ShouldEnd",
+	"WaitingForResult",
+	"Completed",
+	"Failure",
+	"Error",
+}
+
+// String returns the string representation of the StageStatus (you can print as %s)
+func (s StageStatus) String() string {
+	if s < 0 || int(s) >= len(stageStatusLabels) {
+		return fmt.Sprintf("StageStatus(%d)", s)
+	}
+	return stageStatusLabels[s]
+}
