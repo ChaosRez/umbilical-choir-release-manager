@@ -13,7 +13,6 @@ import (
 
 var conf *config.Config
 var rm *release_manager.ReleaseManager
-var rs *storage.ResultStorage
 
 func main() {
 	// Serve handlers in a separate goroutine
@@ -22,7 +21,7 @@ func main() {
 		http.HandleFunc("/release", handlers.ReleaseHandler(rm))
 		http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
 		http.HandleFunc("/end_stage", handlers.EndStageHandler(rm))
-		http.HandleFunc("/result", handlers.ResultHandler(rs))
+		http.HandleFunc("/result", handlers.ResultHandler(rm))
 
 		log.Infof("running api on port %s", conf.Port)
 		if err := http.ListenAndServe(":"+conf.Port, nil); err != nil {
@@ -54,7 +53,7 @@ func main() {
 		}
 	}
 	time.Sleep(30 * time.Second)
-	rm.StageStatusTracker.UpdateStatus(mainRelease.ID, "Canary test sieve", rm.Children[0].ID, models.ShouldEnd)
+	rm.StagesTracker.UpdateStatus(mainRelease.ID, "Canary test sieve", rm.Children[0].ID, models.ShouldEnd)
 	time.Sleep(1000 * time.Second)
 }
 
@@ -76,11 +75,9 @@ func init() {
 			Host: conf.Parent.Host,
 			Port: conf.Parent.Port,
 		},
-		Children:           []*models.Child{},
-		GeographicArea:     conf.ServiceAreaPolygon, // FIXME: if not a leaf, set this to union of children
-		StageStatusTracker: storage.NewStageStatusTracker(),
-		Releases:           storage.NewReleases(),
+		Children:       []*models.Child{},
+		GeographicArea: conf.ServiceAreaPolygon,    // FIXME: if not a leaf, set this to union of children
+		StagesTracker:  storage.NewStagesTracker(), // details of a strategy (release)
+		Releases:       storage.NewReleases(),
 	}
-	// instantiate result storage
-	rs = storage.NewResultStorage()
 }

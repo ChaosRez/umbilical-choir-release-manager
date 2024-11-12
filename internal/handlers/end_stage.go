@@ -29,7 +29,7 @@ func EndStageHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		}
 
 		// Check if the child exists
-		result, exists := rm.StageStatusTracker.GetStatus(req.StrategyID, req.StageName, req.ID)
+		result, exists := rm.StagesTracker.GetStatus(req.StrategyID, req.StageName, req.ID)
 		if !exists {
 			log.Errorf("No stage status found for (strategy: %s, stage: %s, child: %s)", req.StrategyID, req.StageName, req.ID)
 			http.Error(w, "No stage status found for mentioned combination", http.StatusNotFound)

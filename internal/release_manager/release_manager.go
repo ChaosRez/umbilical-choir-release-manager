@@ -10,13 +10,13 @@ import (
 )
 
 type ReleaseManager struct {
-	Host               string          `yaml:"host"`
-	Port               string          `yaml:"port"`
-	GeographicArea     orb.Polygon     `yaml:"geographic_area"`
-	Parent             *models.Parent  `yaml:"parent"`
-	Children           []*models.Child `json:"children"`
-	Releases           *storage.Releases
-	StageStatusTracker *storage.StageStatusTracker
+	Host           string          `yaml:"host"`
+	Port           string          `yaml:"port"`
+	GeographicArea orb.Polygon     `yaml:"geographic_area"`
+	Parent         *models.Parent  `yaml:"parent"`
+	Children       []*models.Child `json:"children"`
+	Releases       *storage.Releases
+	StagesTracker  *storage.Stages
 }
 
 func (rm *ReleaseManager) ChildCount() int {
@@ -30,7 +30,7 @@ func (rm *ReleaseManager) AddChild(child *models.Child) {
 	rm.updateGeographicArea()
 }
 func (rm *ReleaseManager) RegisterChildForRelease(releaseID, childID string, release *storage.Release) {
-	rm.StageStatusTracker.InitStagesForChild(releaseID, childID, release.StageNames)
+	rm.StagesTracker.InitStagesForChild(releaseID, childID, release.StageNames)
 	rm.Releases.MarkChildAsTodo(releaseID, childID)
 	log.Infof("Registered child %s for release %s. Now, child should receive it", childID, releaseID)
 }
@@ -48,8 +48,8 @@ func (rm *ReleaseManager) MarkChildAsNotified(releaseID, childID string) {
 	(*rm.Releases)[releaseID] = release
 	log.Infof("Updated ReleaseStatus to 'Doing' for child %s in release %s", childID, releaseID)
 
-	// Update the first stage status to InProgress
-	rm.StageStatusTracker.UpdateStatus(releaseID, release.StageNames[0], childID, models.InProgress)
+	// Mark the first stage's status as InProgress
+	rm.StagesTracker.UpdateStatus(releaseID, release.StageNames[0], childID, models.InProgress)
 }
 func (rm *ReleaseManager) AreaToJSON() (string, error) {
 	gj := geojson.NewGeometry(rm.GeographicArea)
