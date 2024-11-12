@@ -36,7 +36,7 @@ func PollHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 			return
 		}
 
-		log.Debugf("Decoded request: %+v", pollReq)
+		//log.Debugf("Decoded request: %+v", pollReq)
 
 		geoArea, err := parseGeographicArea(pollReq.GeographicArea)
 		if err != nil {

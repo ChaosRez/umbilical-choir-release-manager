@@ -15,20 +15,6 @@ var conf *config.Config
 var rm *release_manager.ReleaseManager
 
 func main() {
-	// Serve handlers in a separate goroutine
-	go func() {
-		http.HandleFunc("/poll", handlers.PollHandler(rm))
-		http.HandleFunc("/release", handlers.ReleaseHandler(rm))
-		http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
-		http.HandleFunc("/end_stage", handlers.EndStageHandler(rm))
-		http.HandleFunc("/result", handlers.ResultHandler(rm))
-
-		log.Infof("running api on port %s", conf.Port)
-		if err := http.ListenAndServe(":"+conf.Port, nil); err != nil {
-			log.Fatalf("Server failed: %v", err)
-		}
-	}()
-
 	mainRelease := storage.Release{
 		ID:          "21",
 		Name:        "ReleaseSieveFunction",
@@ -52,7 +38,7 @@ func main() {
 			time.Sleep(5 * time.Second)
 		}
 	}
-	time.Sleep(30 * time.Second)
+	time.Sleep(15 * time.Second)
 	rm.StagesTracker.UpdateStatus(mainRelease.ID, "Canary test sieve", rm.Children[0].ID, models.ShouldEnd)
 	time.Sleep(1000 * time.Second)
 }
@@ -80,4 +66,18 @@ func init() {
 		StagesTracker:  storage.NewStagesTracker(), // details of a strategy (release)
 		Releases:       storage.NewReleases(),
 	}
+
+	// Serve handlers in a separate goroutine
+	go func() {
+		http.HandleFunc("/poll", handlers.PollHandler(rm))
+		http.HandleFunc("/release", handlers.ReleaseHandler(rm))
+		http.HandleFunc("/release/functions/", handlers.FunctionsHandler)
+		http.HandleFunc("/end_stage", handlers.EndStageHandler(rm))
+		http.HandleFunc("/result", handlers.ResultHandler(rm))
+
+		log.Infof("running api on port %s", conf.Port)
+		if err := http.ListenAndServe(":"+conf.Port, nil); err != nil {
+			log.Fatalf("Server failed: %v", err)
+		}
+	}()
 }
