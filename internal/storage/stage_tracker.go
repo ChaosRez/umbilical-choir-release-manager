@@ -15,7 +15,7 @@ func NewStagesTracker() *Stages {
 }
 
 func (sts Stages) InitStagesForChild(releaseID, childID string, stageNames []string) {
-	for _, stageName := range stageNames {
+	for _, stageName := range stageNames { // mark all stages as pending
 		key := models.StageStatusKey{ReleaseID: releaseID, StageName: stageName, ChildID: childID}
 		sts[key] = models.StageSummary{StageName: stageName, Status: models.Pending}
 	}
