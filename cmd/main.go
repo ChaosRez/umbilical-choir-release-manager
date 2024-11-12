@@ -45,7 +45,7 @@ func main() {
 		if len(rm.Children) > 0 {
 			log.Infof("First child ID: %s", rm.Children[0].ID)
 			//rm.Releases.MarkChildAsTodo("21", rm.Children[0].ID)
-			rm.RegisterChildForRelease("21", rm.Children[0].ID, &mainRelease)
+			rm.RegisterChildForRelease(rm.Children[0].ID, &mainRelease)
 			break
 		} else {
 			log.Infof("No children found, retrying in 5 seconds...")

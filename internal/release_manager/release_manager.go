@@ -30,10 +30,10 @@ func (rm *ReleaseManager) AddChild(child *models.Child) {
 	rm.Children = append(rm.Children, child)
 	rm.updateGeographicArea()
 }
-func (rm *ReleaseManager) RegisterChildForRelease(releaseID, childID string, release *storage.Release) {
-	rm.StagesTracker.InitStagesForChild(releaseID, childID, release.StageNames)
-	rm.Releases.MarkChildAsTodo(releaseID, childID)
-	log.Infof("Registered child %s for release %s. Now, child should receive it", childID, releaseID)
+func (rm *ReleaseManager) RegisterChildForRelease(childID string, release *storage.Release) {
+	rm.StagesTracker.InitStagesForChild(release.ID, childID, release.StageNames)
+	rm.Releases.MarkChildAsTodo(release.ID, childID)
+	log.Infof("Registered child %s for release %s. Now, child should receive it", childID, release.ID)
 }
 func (rm *ReleaseManager) MarkChildAsNotified(releaseID, childID string) {
 	release, exists := (*rm.Releases)[releaseID]
