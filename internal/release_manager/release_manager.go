@@ -2,6 +2,7 @@ package release_manager
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
 	log "github.com/sirupsen/logrus"
@@ -60,6 +61,24 @@ func (rm *ReleaseManager) AreaToJSON() (string, error) {
 	}
 
 	return string(jsonBlob), nil
+}
+func (rm *ReleaseManager) VisualizeReleases() (string, error) {
+	releasesJSON, err := json.MarshalIndent(rm.Releases, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(releasesJSON), nil
+}
+func (rm *ReleaseManager) VisualizeStagesTracker() (string, error) {
+	stages := make(map[string]models.StageSummary)
+	for key, summary := range *rm.StagesTracker {
+		stages[fmt.Sprintf("%s:%s:%s", key.ReleaseID, key.StageName, key.ChildID)] = summary
+	}
+	stagesJSON, err := json.MarshalIndent(stages, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(stagesJSON), nil
 }
 
 // Private
