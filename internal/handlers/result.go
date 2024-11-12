@@ -42,6 +42,17 @@ func ResultHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 			http.Error(w, "Error saving the result", http.StatusInternalServerError)
 			return
 		}
+
+		// set the next stage's status as InProgress
+		if resultReq.NextStage != "" { // in case of a "rollback" or "rollout", nextStage will be nil, as well as errors/failures
+			rm.StagesTracker.UpdateStatus(resultReq.ReleaseID, resultReq.NextStage, resultReq.ChildID, models.InProgress)
+			log.Infof("Now, waiting for the next stage ('%s')'s result from the child %s: release: %s", resultReq.NextStage, resultReq.ChildID, resultReq.ReleaseID)
+		} else {
+			log.Infof("No nextStage is set. The release strategy is finished for the child %s", resultReq.ChildID)
+			println(rm.VisualizeReleases())
+			println(rm.VisualizeStagesTracker())
+			// TODO, update the release strategy status. Also needs to now if there was a rollback or rollout or error happened
+		}
 		w.WriteHeader(http.StatusOK)
 	}
 }

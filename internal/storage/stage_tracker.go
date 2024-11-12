@@ -41,7 +41,7 @@ func (sts Stages) StoreResult(result models.ResultRequest) error { // Note: for 
 		log.Errorf("Error storing result: stage '%v' does not exist in the result (%s), client '%v'. Expected to be initialized", result.StageSummaries[0].StageName, result.ReleaseID, result.ChildID)
 		return fmt.Errorf("stage '%v' does not exist in the result (%s), child '%s'. Expected to be initialized", result.StageSummaries[0].StageName, result.ReleaseID, result.ChildID)
 	}
-	if currentState.Status > models.Pending {
+	if currentState.Status > models.Pending { // Notes: expects that the status is not Pending (i.e. it is InProgress, ShouldEnd, etc.)
 		sts[key] = result.StageSummaries[0] // TODO: store a batch of stages summaries
 		log.Infof("Result updated for the %s stage, ChildID: %v (Release ID: %v, Number of received results: %v)", result.StageSummaries[0].StageName, result.ChildID, result.ReleaseID, len(result.StageSummaries))
 		return nil
