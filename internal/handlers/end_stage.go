@@ -18,6 +18,7 @@ type EndStageResponse struct {
 	EndStage bool `json:"end_stage"`
 }
 
+// EndStageHandler is used for WaitForSignal stage types
 func EndStageHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req EndStageRequest

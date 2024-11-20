@@ -34,7 +34,7 @@ func (sts Stages) GetResult(releaseID, stageName, childID string) (models.StageS
 	result, exists := sts[key]
 	return result, exists
 }
-func (sts Stages) StoreResult(result models.ResultRequest) error { // Note: for now, only one (first) stage is expected to be sent
+func (sts Stages) StoreResult(result models.ResultRequest) error { // Note: for now, only one stage is expected to be sent (first considered)
 	key := models.StageStatusKey{ReleaseID: result.ReleaseID, StageName: result.StageSummaries[0].StageName, ChildID: result.ChildID}
 	currentState, exists := sts[key]
 	if !exists {
@@ -46,7 +46,7 @@ func (sts Stages) StoreResult(result models.ResultRequest) error { // Note: for 
 		log.Infof("Result updated for the %s stage, ChildID: %v (Release ID: %v, Number of received results: %v)", result.StageSummaries[0].StageName, result.ChildID, result.ReleaseID, len(result.StageSummaries))
 		return nil
 	} else {
-		log.Errorf("stage '%v' already exists in the result (%s), client '%v'", result.StageSummaries[0].StageName, result.ReleaseID, result.ChildID)
+		log.Errorf("stage '%v' already exists in the result (%s) with value '%s', client '%v'", result.StageSummaries[0].StageName, result.ReleaseID, currentState.Status, result.ChildID)
 		return fmt.Errorf("error storing result: stage '%v' already exists in the result (%s), child '%s'", result.StageSummaries[0].StageName, result.ReleaseID, result.ChildID)
 	}
 }
