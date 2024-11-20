@@ -110,8 +110,13 @@ Sample output:
 ## Status codes
 When a child is registered for a strategy (release), the status code will be `Todo`,
 and `Stages` will be initialized for the child with `Pending` status for all stages.
+
 When the child is notified of a release (by polling `/poll`), it will call on `/release` to get the instructions, and the release (strategy) status will be `Doing` and the first stage's status will set as `InProgress`.
 Then, the child is expected to run each stage and send the results to `/result`, where the stage's status also updates to either `Completed`, `Failure`, or `Error` (sent by the child agent).
+If the stage is `Completed`, the next stage will be set to `InProgress` and the child will be notified of the next stage.
+Otherwise, if there is no NextStage (a `rollout` or `rollback` action happened), which means the child finished/stopped the release strategy, the stage's status will be checked:
+If the stage is a `Failure` or `Error`, the child's release strategy status will be set to `Failed`.
+Otherwise, the stage should be `Completed` and the release strategy status will be set to `Done`.
 In case of a `WaitForSignal` stage, the child polls `/end_stage` if the stage's status is `ShouldEnd` (or later) to end the stage, regardless of a minimum run time and call count.
 
 Here is a status description for `ReleaseStatus` and `StageStatus` (enums):
