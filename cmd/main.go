@@ -13,34 +13,44 @@ import (
 
 var conf *config.Config
 var rm *release_manager.ReleaseManager
+var mainRelease storage.Release
+var canaryRelease storage.Release
 
 func main() {
-	mainRelease := storage.Release{
-		ID:          "21",
-		Name:        "ReleaseSieveFunction",
-		Type:        "major",
-		Functions:   []string{"sieve"},
-		ChildStatus: map[string]models.ReleaseStatus{},
-		StageNames:  []string{"Canary test sieve", "A/B Test Sieve"},
-	}
-	rm.Releases.AddRelease(mainRelease)
-	// TODO: simulate a canary
-	// Check for children every 5 seconds
-	time.Sleep(5 * time.Second)
+	// >>> simulate a canary <<<<
+	// location_sequential: %10 to %100 of a location, then next location (local first),
+	// The parent choose a child and ask for gradual 1 to 100, when child is done, will tell the parent
+
+	log.Info("Waiting for at least 2 children to start canary")
 	for {
-		if len(rm.Children) > 0 {
-			log.Infof("First child ID: %s", rm.Children[0].ID)
-			//rm.Releases.MarkChildAsTodo("21", rm.Children[0].ID)
-			rm.RegisterChildForRelease(rm.Children[0].ID, &mainRelease)
-			break
-		} else {
-			log.Infof("No children found, retrying in 5 seconds...")
-			time.Sleep(5 * time.Second)
+		time.Sleep(5 * time.Second)
+		if len(rm.Children) > 1 {
+			log.Infof("Starting canary with %d children", len(rm.Children))
+			for _, child := range rm.Children {
+				rm.RegisterChildForRelease(child.ID, &canaryRelease)
+
+				// wait for nextChild to finish
+				for {
+					releaseStatus, exists := rm.Releases.GetChildStatus(canaryRelease.ID, child.ID)
+					if exists {
+						if releaseStatus == models.Done {
+							break
+						} else if releaseStatus == models.Failed {
+							log.Fatalf("Child %s failed (%s) on the release %s", child.ID, releaseStatus.String(), canaryRelease.ID)
+						}
+					} else {
+						log.Fatalf("Release status not found for child %s", child.ID)
+					}
+					time.Sleep(1 * time.Second)
+				}
+			}
+			break // canary is done. don't repeat the release
 		}
 	}
-	time.Sleep(15 * time.Second)
-	rm.StagesTracker.UpdateStatus(mainRelease.ID, "Canary test sieve", rm.Children[0].ID, models.ShouldEnd)
-	time.Sleep(1000 * time.Second)
+
+	//time.Sleep(15 * time.Second)
+	//rm.StagesTracker.UpdateStatus(mainRelease.ID, mainRelease.StageNames[0], rm.Children[0].ID, models.ShouldEnd)
+	time.Sleep(2 * time.Second)
 }
 
 func init() {
@@ -66,6 +76,26 @@ func init() {
 		StagesTracker:  storage.NewStagesTracker(), // details of a strategy (release)
 		Releases:       storage.NewReleases(),
 	}
+
+	// Register a release
+	mainRelease = storage.Release{
+		ID:          "21",
+		Name:        "ReleaseSieveFunction",
+		Type:        "major",
+		Functions:   []string{"sieve"},
+		ChildStatus: map[string]models.ReleaseStatus{},
+		StageNames:  []string{"Canary test sieve", "A/B Test Sieve"},
+	}
+	canaryRelease = storage.Release{
+		ID:          "22",
+		Name:        "Canary10To100_LocationSequential",
+		Type:        "major",
+		Functions:   []string{"sieve"},
+		ChildStatus: map[string]models.ReleaseStatus{},
+		StageNames:  []string{"Canary sieve 10", "Canary sieve 90"},
+	}
+	rm.Releases.AddRelease(mainRelease)
+	rm.Releases.AddRelease(canaryRelease)
 
 	// Serve handlers in a separate goroutine
 	go func() {
