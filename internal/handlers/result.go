@@ -12,7 +12,7 @@ func ResultHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var resultReq models.ResultRequest
 
-		log.Debugf("Incoming result: %v", r.Body)
+		//log.Debugf("Incoming result: %v", r.Body)
 
 		if err := json.NewDecoder(r.Body).Decode(&resultReq); err != nil {
 			log.Errorf("Error decoding result: %v", err)
@@ -39,7 +39,7 @@ func ResultHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		_, exists := rm.StagesTracker.GetResult(resultReq.ReleaseID, resultReq.StageSummaries[0].StageName, resultReq.ChildID)
 		if !exists {
 			log.Errorf("Error getting result from db (read-your-write) for the pair: %s : %s", resultReq.ChildID, resultReq.ReleaseID)
-			http.Error(w, "Error saving the result", http.StatusInternalServerError)
+			http.Error(w, "Error saving the result (read-your-write)", http.StatusInternalServerError)
 			return
 		}
 
@@ -49,6 +49,7 @@ func ResultHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 			log.Infof("Now, waiting for the next stage ('%s')'s result from the child %s: release: %s", resultReq.NextStage, resultReq.ChildID, resultReq.ReleaseID)
 		} else {
 			log.Infof("No nextStage is set. The release strategy is finished for the child %s", resultReq.ChildID)
+			rm.MarkChildAsFinished(resultReq.ReleaseID, resultReq.ChildID, resultReq.StageSummaries[0].Status)
 			println(rm.VisualizeReleases())
 			println(rm.VisualizeStagesTracker())
 			// TODO, update the release strategy status. Also needs to now if there was a rollback or rollout or error happened

@@ -30,7 +30,7 @@ func (r Releases) AddRelease(release Release) {
 	log.Infof("Added release '%s' to Releases", release.ID)
 }
 
-func (r Releases) MarkChildAsTodo(releaseID, childID string) {
+func (r Releases) MarkChildAsTodo(releaseID, childID string) { // Note: don't use directly, instead use ReleaseManager.RegisterChildForRelease
 	release, exists := r[releaseID]
 	if !exists {
 		log.Errorf("release '%s' not found in Releases to register the child for it", releaseID)
@@ -53,4 +53,28 @@ func (r Releases) GetNextReleaseForChild(childID string) (string, bool) {
 		}
 	}
 	return "", false
+}
+func (r Releases) SetChildStatus(releaseID, childID string, status models.ReleaseStatus) {
+	release, exists := r[releaseID]
+	if !exists {
+		log.Errorf("release '%s' not found in Releases to set the child status", releaseID)
+		return
+	}
+
+	release.ChildStatus[childID] = status
+	r[releaseID] = release
+	log.Infof("Set status '%s' for child '%s' in release '%s'", status, childID, releaseID)
+}
+func (r Releases) GetChildStatus(releaseID, childID string) (models.ReleaseStatus, bool) {
+	release, exists := r[releaseID]
+	if !exists {
+		log.Errorf("release '%s' not found in Releases", releaseID)
+		return models.No, false
+	}
+
+	status, exists := release.ChildStatus[childID]
+	if !exists {
+		log.Warnf("child '%s' not found in release '%s'", childID, releaseID)
+	}
+	return status, exists
 }

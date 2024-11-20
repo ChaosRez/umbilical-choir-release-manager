@@ -52,6 +52,17 @@ func (rm *ReleaseManager) MarkChildAsNotified(releaseID, childID string) {
 	// Mark the first stage's status as InProgress
 	rm.StagesTracker.UpdateStatus(releaseID, release.StageNames[0], childID, models.InProgress)
 }
+func (rm *ReleaseManager) MarkChildAsFinished(releaseID, childID string, lastStageStatus models.StageStatus) {
+	switch lastStageStatus {
+	case models.Completed:
+		rm.Releases.SetChildStatus(releaseID, childID, models.Done)
+	case models.Failure, models.Error:
+		rm.Releases.SetChildStatus(releaseID, childID, models.Failed)
+		log.Warnf("Child %s failed (%s) on the %s stage", childID, lastStageStatus.String(), releaseID)
+	default:
+		log.Errorf("unexpected stage status '%s' for child '%s' in release '%s'", lastStageStatus, childID, releaseID)
+	}
+}
 func (rm *ReleaseManager) AreaToJSON() (string, error) {
 	gj := geojson.NewGeometry(rm.GeographicArea)
 
