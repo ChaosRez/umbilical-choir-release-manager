@@ -27,20 +27,20 @@ type StageStatusKey struct {
 }
 
 const ( // NOTE, for any change, update stageStatusLabels (+ the readme, and agent)
-	Pending          StageStatus = iota // The first stage status will be initialized as InProgress and never will be Pending
-	InProgress                          // the child is notified
-	ShouldEnd                           // only WaitForSignal stage type. The child poll for it on /end_stage to finish a stage
-	WaitingForResult                    // either after ShouldEnd or after InProgress (may stay at InProgress and jump to Completed)
-	Completed                           // received the stage result
-	Failure                             // received the stage result as Failure
-	Error                               // received the stage result as Error
+	Pending        StageStatus = iota // The first stage status will be initialized as InProgress and never will be Pending
+	InProgress                        // the child is notified
+	SuccessWaiting                    // only WaitForSignal stage type. The child received enough calls and was successful
+	ShouldEnd                         // only WaitForSignal stage type. The child poll for it on /end_stage to finish a stage (set by the parent)
+	Completed                         // received the stage result
+	Failure                           // received the stage result as Failure
+	Error                             // received the stage result as Error
 )
 
 var stageStatusLabels = []string{
 	"Pending",
 	"InProgress",
+	"SuccessWaiting",
 	"ShouldEnd",
-	"WaitingForResult",
 	"Completed",
 	"Failure",
 	"Error",

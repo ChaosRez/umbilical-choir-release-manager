@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
-	"umbilical-choir-release-master/internal/canary"
+	Canary "umbilical-choir-release-master/internal/canary"
 	"umbilical-choir-release-master/internal/config"
 	"umbilical-choir-release-master/internal/handlers"
 	"umbilical-choir-release-master/internal/models"
@@ -15,19 +15,19 @@ import (
 var conf *config.Config
 var rm *release_manager.ReleaseManager
 var mainRelease storage.Release
-var canaryRelease storage.Release
+var canaryReleaseLocSeq storage.Release
+var canaryReleaseGlobInc storage.Release
 
 func main() {
-	// location_sequential canary: %10 to %100 of a location, then next location (local first),
-	// The parent choose a child and ask for gradual 1 to 100, when child is done, will tell the parent
 
-	log.Info("Waiting for at least 2 children to start canary")
-	canary.WaitForChildrenAndStartCanary(rm, canaryRelease, 2)
+	Canary.WaitForEnoughChildren(rm, 2)
+	//Canary.RunCanaryLocSeq(rm, canaryReleaseLocSeq)
+	Canary.RunCanaryGlobInc(rm, canaryReleaseGlobInc)
 
 	//time.Sleep(15 * time.Second)
 	// Mark client as should end (WaitForSignal)
 	//rm.StagesTracker.UpdateStatus(mainRelease.ID, mainRelease.StageNames[0], rm.Children[0].ID, models.ShouldEnd)
-	time.Sleep(2 * time.Second)
+	time.Sleep(100 * time.Second)
 }
 
 func init() {
@@ -63,7 +63,7 @@ func init() {
 		ChildStatus: map[string]models.ReleaseStatus{},
 		StageNames:  []string{"Canary test sieve", "A/B Test Sieve"},
 	}
-	canaryRelease = storage.Release{
+	canaryReleaseLocSeq = storage.Release{
 		ID:          "22",
 		Name:        "Canary10To100_LocationSequential",
 		Type:        "major",
@@ -71,8 +71,17 @@ func init() {
 		ChildStatus: map[string]models.ReleaseStatus{},
 		StageNames:  []string{"Canary sieve 10", "Canary sieve 90"},
 	}
+	canaryReleaseGlobInc = storage.Release{
+		ID:          "23",
+		Name:        "Canary10To100_GlobalIncremental",
+		Type:        "major",
+		Functions:   []string{"sieve"},
+		ChildStatus: map[string]models.ReleaseStatus{},
+		StageNames:  []string{"Canary sieve 10", "Canary sieve 50", "Canary sieve 90"},
+	}
 	rm.Releases.AddRelease(mainRelease)
-	rm.Releases.AddRelease(canaryRelease)
+	rm.Releases.AddRelease(canaryReleaseLocSeq)
+	rm.Releases.AddRelease(canaryReleaseGlobInc)
 
 	// Serve handlers in a separate goroutine
 	go func() {

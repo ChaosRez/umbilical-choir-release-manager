@@ -1,0 +1,236 @@
+id: 23
+name: Canary10To100_GlobalIncremental
+type: patch/major/minor
+functions:
+  - name: sieve
+    base_version:
+      path: fns/sample_f1
+      env: nodejs
+    new_version:
+      path: fns/sample_f2
+      env: nodejs
+stages:
+  - name: Canary sieve 10
+    type: WaitForSignal
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 90
+      - name: new_version
+        trafficPercentage: 10 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "10"
+    end_action:
+      onSuccess: Canary sieve 50 #Canary sieve 20
+      onFailure: rollback
+#  - name: Canary sieve 20
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 80
+#      - name: new_version
+#        trafficPercentage: 20 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 30
+#      onFailure: rollback
+#  - name: Canary sieve 30
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 70
+#      - name: new_version
+#        trafficPercentage: 30 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 40
+#      onFailure: rollback
+#  - name: Canary sieve 40
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 60
+#      - name: new_version
+#        trafficPercentage: 40 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 50
+#      onFailure: rollback
+  - name: Canary sieve 50
+    type: WaitForSignal
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 50
+      - name: new_version
+        trafficPercentage: 50 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "10"
+    end_action:
+      onSuccess: Canary sieve 90
+      onFailure: rollback
+#  - name: Canary sieve 60
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 40
+#      - name: new_version
+#        trafficPercentage: 60 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 70
+#      onFailure: rollback
+#  - name: Canary sieve 70
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 30
+#      - name: new_version
+#        trafficPercentage: 70 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 80
+#      onFailure: rollback
+#  - name: Canary sieve 80
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 20
+#      - name: new_version
+#        trafficPercentage: 80 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: Canary sieve 90
+#      onFailure: rollback
+  - name: Canary sieve 90
+    type: WaitForSignal
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 10
+      - name: new_version
+        trafficPercentage: 90 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "10"
+    end_action:
+      onSuccess: rollout #Canary sieve 100
+      onFailure: rollback
+#  - name: Canary sieve 100
+#    type: WaitForSignal
+#    func_name: sieve
+#    variants:
+#      - name: base_version
+#        trafficPercentage: 0
+#      - name: new_version
+#        trafficPercentage: 100 # can't be changed after proxy deployment
+#    metrics_conditions: # AND condition
+#      - name: errorRate
+#        threshold: "<0.02"
+#      - name: responseTime
+#        threshold: "<=200"
+#        compareWith: "Median"
+#    end_conditions:
+#      - name: minDuration
+#        threshold: 10s
+#      - name: minCalls
+#        threshold: "10"
+#    end_action:
+#      onSuccess: rollout
+#      onFailure: rollback
+
+rollback:
+  action:
+    function: base_version
