@@ -8,6 +8,7 @@ import (
 	"github.com/paulmach/orb/geojson"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 	"time"
 	"umbilical-choir-release-master/internal/models"
 	"umbilical-choir-release-master/internal/release_manager"
@@ -48,6 +49,9 @@ func PollHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		// add the child to the release manager, if no id is passed
 		if pollReq.ID == "" {
 			pollReq.ID = uuid.New().String()
+			if idx := strings.LastIndex(pollReq.ID, "-"); idx != -1 { // make the ID simpler!
+				pollReq.ID = pollReq.ID[idx+1:]
+			}
 			newChild := &models.Child{
 				ID:             pollReq.ID,
 				GeographicArea: geoArea,
