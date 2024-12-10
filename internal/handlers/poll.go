@@ -49,7 +49,7 @@ func PollHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		// add the child to the release manager, if no id is passed
 		if pollReq.ID == "" {
 			pollReq.ID = uuid.New().String()
-			if idx := strings.LastIndex(pollReq.ID, "-"); idx != -1 { // make the ID simpler!
+			if idx := strings.LastIndex(pollReq.ID, "-"); idx != -1 { // simplify the ID!
 				pollReq.ID = pollReq.ID[idx+1:]
 			}
 			newChild := &models.Child{
@@ -60,6 +60,7 @@ func PollHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 			rm.AddChild(newChild)
 			log.Info("updated child count: ", rm.ChildCount())
 		}
+		// TODO: update LastPoll for the child (and add a create_at field)
 
 		// Check if release.yml exists
 		newRelease := ""
@@ -67,7 +68,7 @@ func PollHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		if anyPendingReleaseForChild {
 			newRelease = releaseID
 		} else {
-			log.Debugf("No pending release found for this Child ID %s", pollReq.ID)
+			//log.Debugf("No pending release found for this Child ID %s", pollReq.ID)
 		}
 
 		pollResp := PollResponse{

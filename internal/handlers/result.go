@@ -50,7 +50,7 @@ func ResultHandler(rm *release_manager.ReleaseManager) http.HandlerFunc {
 		} else {
 			log.Infof("No nextStage is set. The release strategy is finished for the child %s", resultReq.ChildID)
 			rm.MarkChildAsFinished(resultReq.ReleaseID, resultReq.ChildID, resultReq.StageSummaries[0].Status)
-			println(rm.VisualizeReleases())
+			//println(rm.VisualizeReleases())
 			println(rm.VisualizeStagesTracker())
 			// TODO, update the release strategy status. Also needs to now if there was a rollback or rollout or error happened
 		}

@@ -133,7 +133,7 @@ current state of stages in a release strategy for a child:
 
 - **Pending**: The stage is pending.
 - **InProgress**: The child is notified and the stage is in progress.
-- **SuccessWaiting**: Only for `WaitForSignal` stage type. The child received enough calls and was successful, now waiting for the parent to end the stage.
+- **SuccessWaiting**: Only for `WaitForSignal` stage type. The child received enough calls and was successful, now waiting for the parent to end the stage. The child also sends a preliminary aggregated results. 
 - **ShouldEnd**: Only for `WaitForSignal` stage type. The child polls for it on `/end_stage` to finish a stage.
 - **Completed**: The stage result has been received and the stage is completed.
 - **Failure**: The stage result has been received as a failure.

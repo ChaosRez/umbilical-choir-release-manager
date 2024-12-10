@@ -67,7 +67,7 @@ func RunCanaryGlobInc(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 				rm.RegisterChildForRelease(child.ID, &canaryRelease)
 			} else {
 				// Tell the child to finish the previous stage
-				rm.StagesTracker.UpdateStatus(canaryRelease.ID, prevStageName, child.ID, models.ShouldEnd)
+				rm.MarkStageAsShouldEnd(canaryRelease.ID, prevStageName, child.ID)
 			}
 
 			// wait for the child to finish the current stage
@@ -78,6 +78,7 @@ func RunCanaryGlobInc(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 						log.Debugf("Child %s successfully finished the stage '%s' for release %s", child.ID, stageName, canaryRelease.ID)
 						break
 					} else if stageStatus == models.Failure || stageStatus == models.Error {
+						//TODO: rollback, and tell all children to finish/rollback
 						log.Fatalf("Child %s failed (%s) on the stage '%s' of release %s", child.ID, stageStatus.String(), stageName, canaryRelease.ID)
 					} else if stageStatus == models.Completed {
 						log.Errorf("Unexpected! Child %s already finished the stage '%s' with status '%s' for release %s, While it had to wait for the parent before finishing", child.ID, stageName, stageStatus.String(), canaryRelease.ID)
@@ -98,7 +99,7 @@ func RunCanaryGlobInc(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 			log.Fatalf("Stage status not found for child %s on last stage %s", child.ID, prevStageName)
 		}
 		if currentStatus == models.SuccessWaiting {
-			rm.StagesTracker.UpdateStatus(canaryRelease.ID, prevStageName, child.ID, models.ShouldEnd)
+			rm.MarkStageAsShouldEnd(canaryRelease.ID, prevStageName, child.ID)
 		} else {
 			log.Warnf("Expected to mark child %s as should end, but it is not in 'SuccessWaiting' state, instead '%s'", child.ID, currentStatus)
 		}

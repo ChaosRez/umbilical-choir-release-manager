@@ -63,6 +63,10 @@ func (rm *ReleaseManager) MarkChildAsFinished(releaseID, childID string, lastSta
 		log.Errorf("unexpected stage status '%s' for child '%s' in release '%s'", lastStageStatus, childID, releaseID)
 	}
 }
+func (rm *ReleaseManager) MarkStageAsShouldEnd(releaseID, stageName, childID string) {
+	rm.StagesTracker.UpdateStatus(releaseID, stageName, childID, models.ShouldEnd)
+	log.Infof("Marked stage '%s' as ShouldEnd for child '%s' in release '%s'", stageName, childID, releaseID)
+}
 func (rm *ReleaseManager) AreaToJSON() (string, error) {
 	gj := geojson.NewGeometry(rm.GeographicArea)
 
