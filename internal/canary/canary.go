@@ -21,7 +21,7 @@ func WaitForEnoughChildren(rm *RM.ReleaseManager, minClients int) {
 
 // location_sequential canary: %10 to %100 of a location (from release strategy), then next location (local first),
 // The parent choose a child and ask for gradual 1 to 100, when child is done, will tell the parent
-func RunCanaryLocSeq(rm *RM.ReleaseManager, canaryRelease storage.Release) {
+func RunLocSeqAllChild(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 	for _, child := range rm.Children {
 		rm.RegisterChildForRelease(child.ID, &canaryRelease)
 
@@ -58,7 +58,7 @@ func RunCanaryLocSeq(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 
 // global_incremental canary: %10 of all locations, then %20 of all locations (global first),
 // if the requirements met and it is a failure/error will return, but if it is a success, will send a preliminary result and waits for the parent's signal
-func RunCanaryGlobInc(rm *RM.ReleaseManager, canaryRelease storage.Release) {
+func RunGlobalIncAllChild(rm *RM.ReleaseManager, canaryRelease storage.Release) {
 	prevStageName := ""
 	for _, stageName := range canaryRelease.StageNames {
 		log.Infof("Telling children to start the stage '%s' one after another", stageName)

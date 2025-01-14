@@ -1,0 +1,38 @@
+id: 11
+name: canary5percent
+type: patch/major/minor
+functions:
+  - name: sieve
+    base_version:
+      path: fns/sample_f1
+      env: nodejs
+    new_version:
+      path: fns/sample_f2
+      env: nodejs
+stages:
+  - name: Canary 5 Percent
+    type: WaitForSignal
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 95
+      - name: new_version
+        trafficPercentage: 5 # can't be changed after proxy deployment
+    metrics_conditions:
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "50"
+    end_action:
+      onSuccess: rollback # Still want to rollback, still not sure if safe
+      onFailure: rollback
+
+rollback:
+  action:
+    function: base_version

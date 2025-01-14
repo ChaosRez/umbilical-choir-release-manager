@@ -1,0 +1,37 @@
+id: 12
+name: A/BTestSieveFunction
+type: patch/major/minor
+functions:
+  - name: sieve
+    base_version:
+      path: fns/sample_f1
+      env: nodejs
+    new_version:
+      path: fns/sample_f2
+      env: nodejs
+stages:
+  - name: A/B Test Sieve
+    type: A/B
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 50
+      - name: new_version
+        trafficPercentage: 50 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.01"
+      - name: responseTime
+        threshold: "<=200"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "50"
+    end_action:
+      onSuccess: rollback # still not sure if safe
+      onFailure: rollback
+rollback:
+  action:
+    function: base_version
