@@ -47,6 +47,8 @@ func (r Releases) GetNextReleaseForChild(childID string) (string, bool) {
 		if status, exists := release.ChildStatus[childID]; exists {
 			if status == models.Todo { // pending release for the child
 				return releaseID, true
+			} else if status == models.Done {
+				// already done. skip
 			} else {
 				log.Debugf("(ReleaseStatus: %v) release %s is not supposed to be run by the child %s", status, releaseID, childID)
 			}
