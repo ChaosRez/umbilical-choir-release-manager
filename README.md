@@ -1,4 +1,19 @@
 # Umbilical Choir: Release Manager
+This repository is part of the [Umbilical Choir project](https://github.com/ChaosRez/umbilical-choir-core).
+For other repositories, see the [Umbilical Choir Agent](https://github.com/ChaosRez/umbilical-choir-core) and [Umbilical Choir Proxy](https://github.com/ChaosRez/umbilical-choir-proxy) repositories.
+--------
+RMs are organized recursively with one or more children (either RMs or Agents) and optionally a parent.
+Each RM is aware of the capabilities of its child nodes, for this child RMs aggregate capabilities from their children and report them to their parent.
+Furthermore, each RM is responsible for a geographic area, i.e., the area where the FaaS services on which it is deploying is running.
+Often but not necessarily, it will be deployed near or on their live testing runtime targets -- on or near the edge or within the same cloud datacenter.
+
+With this, each RM has sufficient knowledge to process release strategies.
+Upon receipt of a new release strategy, either from the developer or from a parent RM, the RM plans how best to execute the release strategy with the available child nodes, their capabilities, and locations.
+Based on this plan, the RM creates a new release strategy for each of its child nodes that are necessary for following the plan and forwards it to the respective nodes.
+
+## Release Strategy definition
+The developer can define a release strategy including multiple stages of live testing in a human-readable YAML format.
+Refer to `releases` folder for sample release strategies.
 
 ### `/poll` endpoint
 The endpoint for the children to poll for new updates and sending their geo area and number of the children they have  
@@ -138,3 +153,6 @@ current state of stages in a release strategy for a child:
 - **Failure**: The stage result has been received as a failure.
 - **Error**: The stage result has been received as an error.
 
+## Acknowledgement
+This repository is part of the [Umbilical Choir](https://github.com/ChaosRez/umbilical-choir-core) project.
+If you use this code, please cite our paper and reference this repository in your own code repository.
