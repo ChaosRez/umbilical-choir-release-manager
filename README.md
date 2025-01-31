@@ -1,5 +1,4 @@
-Umbilical Choir: Release Manager
---------------------------------
+# Umbilical Choir: Release Manager
 
 ### `/poll` endpoint
 The endpoint for the children to poll for new updates and sending their geo area and number of the children they have  
@@ -40,7 +39,7 @@ Sample input:
 Sample output:
 ```json
 {
-	"id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867",
+  "id": "7cb606ee-fde1-4b2c-bffc-20f558fc2867",
   "new_release": "<releaseID>"
 }
 ```
@@ -108,8 +107,8 @@ Sample output:
 ```
 
 ## Status codes
-When a child is registered for a strategy (release), the status code will be `Todo`,
-and `Stages` will be initialized for the child with `Pending` status for all stages.
+Upon a child's registration within a Release Strategy, their status code is initialized to `Todo`,
+and the associated Release Strategy stages are assigned an initial status of `Pending`.
 
 When the child is notified of a release (by polling `/poll`), it will call on `/release` to get the instructions, and the release (strategy) status will be `Doing` and the first stage's status will set as `InProgress`.
 Then, the child is expected to run each stage and send the results to `/result`, where the stage's status also updates to either `Completed`, `Failure`, or `Error` (sent by the child agent).
@@ -132,7 +131,7 @@ state of a specific release (strategy) for a child:
 current state of stages in a release strategy for a child:
 
 - **Pending**: The stage is pending.
-- **InProgress**: The child is notified and the stage is in progress.
+- **InProgress**: The child is notified, and the stage is in progress.
 - **SuccessWaiting**: Only for `WaitForSignal` stage type. The child received enough calls and was successful, now waiting for the parent to end the stage. The child also sends a preliminary aggregated results. 
 - **ShouldEnd**: Only for `WaitForSignal` stage type. The child polls for it on `/end_stage` to finish a stage.
 - **Completed**: The stage result has been received and the stage is completed.

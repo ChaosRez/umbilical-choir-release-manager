@@ -11,7 +11,7 @@ import (
 func WaitForEnoughChildren(rm *RM.ReleaseManager, minClients int) {
 	log.Infof("Waiting for at least %d children to start canary", minClients)
 	for {
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Second)
 		if len(rm.Children) >= minClients {
 			log.Infof("Found %d children, ready to start canary", len(rm.Children))
 			return

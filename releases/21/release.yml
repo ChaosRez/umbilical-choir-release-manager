@@ -11,24 +11,24 @@ functions:
       env: nodejs
 stages:
   - name: Canary test sieve
-    type: A/B # TODO remove type? or modify
+    type: WaitForSignal # TODO modify?
     func_name: sieve
     variants:
       - name: base_version
-        trafficPercentage: 80
+        trafficPercentage: 90
       - name: new_version
-        trafficPercentage: 20 # can't be changed after proxy deployment
+        trafficPercentage: 10 # can't be changed after proxy deployment
     metrics_conditions: # AND condition
       - name: errorRate
         threshold: "<0.02"
       - name: responseTime
         threshold: "<=200"
         compareWith: "Median"
-    end_conditions:
+    end_conditions: # NOTE: not considered by WaitForSignal type
       - name: minDuration
-        threshold: 15s
+        threshold: 10s
       - name: minCalls
-        threshold: "30"
+        threshold: "10"
     end_action:
       onSuccess: A/B Test Sieve
       onFailure: rollback
@@ -48,9 +48,9 @@ stages:
         compareWith: "Median"
     end_conditions:
       - name: minDuration
-        threshold: 15s
+        threshold: 10s
       - name: minCalls
-        threshold: "30"
+        threshold: "10"
     end_action:
       onSuccess: rollout
       onFailure: rollback

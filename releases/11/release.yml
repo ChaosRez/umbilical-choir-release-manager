@@ -28,7 +28,7 @@ stages:
       - name: minDuration
         threshold: 10s
       - name: minCalls
-        threshold: "50"
+        threshold: "100"
     end_action:
       onSuccess: rollback # Still want to rollback, still not sure if safe
       onFailure: rollback

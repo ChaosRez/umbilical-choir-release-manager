@@ -28,7 +28,7 @@ stages:
       - name: minDuration
         threshold: 10s
       - name: minCalls
-        threshold: "50"
+        threshold: "100"
     end_action:
       onSuccess: Canary sieve 50 #Canary sieve 20
       onFailure: rollback
@@ -116,7 +116,7 @@ stages:
       - name: minDuration
         threshold: 10s
       - name: minCalls
-        threshold: "50"
+        threshold: "100"
     end_action:
       onSuccess: Canary sieve 90
       onFailure: rollback
@@ -204,7 +204,7 @@ stages:
       - name: minDuration
         threshold: 10s
       - name: minCalls
-        threshold: "50"
+        threshold: "100"
     end_action:
       onSuccess: rollout #Canary sieve 100
       onFailure: rollback
