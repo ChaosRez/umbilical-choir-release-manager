@@ -156,3 +156,20 @@ current state of stages in a release strategy for a child:
 ## Acknowledgement
 This repository is part of the [Umbilical Choir](https://github.com/ChaosRez/umbilical-choir-core) project.
 If you use this code, please cite our paper and reference this repository in your own code repository.
+
+## Research
+If you use any of Umbilical Choir's software components ([Release Manager](https://github.com/ChaosRez/umbilical-choir-release-manager), [Proxy](https://github.com/ChaosRez/umbilical-choir-proxy), and [Agent](https://github.com/ChaosRez/umbilical-choir-core)) in a publication, please cite it as:
+
+### Text
+
+M. Malekabbasi, T. Pfandzelter, and D. Bermbach, **Umbilical Choir: Automated Live Testing for Edge-To-Cloud FaaS Applications**, 2025.
+
+### BibTeX
+
+```bibtex
+@article{malekabbasi2025umbilicalchoir,
+  title={Umbilical Choir: Automated Live Testing for Edge-To-Cloud FaaS Applications},
+  author={Malekabbasi, Mohammadreza and Pfandzelter, Tobias and Bermbach, David},
+  year={2025}
+}
+```
