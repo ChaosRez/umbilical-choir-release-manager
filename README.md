@@ -10,6 +10,7 @@ Often but not necessarily, it will be deployed near or on their live testing run
 With this, each RM has sufficient knowledge to process release strategies.
 Upon receipt of a new release strategy, either from the developer or from a parent RM, the RM plans how best to execute the release strategy with the available child nodes, their capabilities, and locations.
 Based on this plan, the RM creates a new release strategy for each of its child nodes that are necessary for following the plan and forwards it to the respective nodes.
+[read more](https://arxiv.org/abs/2503.054950)
 
 ## Release Strategy definition
 The developer can define a release strategy including multiple stages of live testing in a human-readable YAML format.
