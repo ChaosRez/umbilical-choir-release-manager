@@ -15,6 +15,50 @@ Based on this plan, the RM creates a new release strategy for each of its child 
 The developer can define a release strategy including multiple stages of live testing in a human-readable YAML format.
 Refer to `releases` folder for sample release strategies.
 
+### Sample
+Following instruction will run a one-stage live test for at least `10` seconds and `100` calls while exposing `%5` of traffic to the `new_version`. Then the collected metrics for the version will be checked against the thresholds. If the stage is successful `onSuccess`'s action will be run afterward, similarly for `onFailure`. The actions include `rollout`, `rollback`, or a specific (next) stage name.
+```yaml
+id: 11
+name: canary5percent
+type: patch/major/minor
+functions:
+  - name: sieve
+    base_version:
+      path: fns/sample_f1
+      env: nodejs
+    new_version:
+      path: fns/sample_f2
+      env: nodejs
+stages:
+  - name: Canary 5 Percent
+    type: WaitForSignal
+    func_name: sieve
+    variants:
+      - name: base_version
+        trafficPercentage: 95
+      - name: new_version
+        trafficPercentage: 5 # can't be changed after proxy deployment
+    metrics_conditions: # AND condition
+      - name: errorRate
+        threshold: "<0.02"
+      - name: responseTime
+        threshold: "<=250"
+        compareWith: "Median"
+    end_conditions:
+      - name: minDuration
+        threshold: 10s
+      - name: minCalls
+        threshold: "100"
+    end_action:
+      onSuccess: rollout
+      onFailure: rollback
+
+rollback:
+  action:
+    function: base_version
+```
+
+## Endpoints and data format
 ### `/poll` endpoint
 The endpoint for the children to poll for new updates and sending their geo area and number of the children they have  
 Sample input:
@@ -173,3 +217,6 @@ M. Malekabbasi, T. Pfandzelter, and D. Bermbach, **Umbilical Choir: Automated Li
   year={2025}
 }
 ```
+
+## Contributing
+You are welcome to contribute to Umbilical Choir project. Please open a PR in any of UC repositories.
